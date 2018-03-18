@@ -88,6 +88,8 @@ alias zshreload="source ~/.zshrc"
 alias ec='emacsclient -nw -n -F "((fullscreen . fullboth))"'
 alias ect='emacsclient -nw'
 
+alias chrome="google-chrome-stable"
+
 #VI MODE
 #bindkey -v
 #export KEYTIMEOUT=1
@@ -106,6 +108,9 @@ readmd () {
 }
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+FZF_CTRL_T_OPTS="--preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -200'"
+export FZF_CTRL_T_OPTS
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="/home/imgulyas/.sdkman"
