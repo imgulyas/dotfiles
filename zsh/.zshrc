@@ -85,7 +85,7 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias bat='upower -i /org/freedesktop/UPower/devices/battery_BAT0| grep -E "state|to\ empty|percentage"'
 alias zshreload="source ~/.zshrc"
-alias ec='emacsclient -nw -n -F "((fullscreen . fullboth))"'
+alias ec='emacsclient --create-frame --no-wait "$@"'
 alias ect='emacsclient -nw'
 
 alias chrome="google-chrome-stable"
@@ -94,25 +94,33 @@ alias chrome="google-chrome-stable"
 #bindkey -v
 #export KEYTIMEOUT=1
 
-#SWITCH ESCAPE AND CAPS
+# SWITCH ESCAPE AND CAPS
 /usr/bin/setxkbmap -option "caps:escape"
 alias esctocaps='/usr/bin/setxkbmap -option "caps:escape"'
 
+export EDITOR='emacsclient --create-frame --no-wait "$@"'
+
+#BROWSER
+export BROWSER='/var/lib/snapd/snap/bin/firefox'
 
 #INOTIFY
 #echo 16384 | sudo tee /proc/sys/fs/inotify/max_user_watches
 
-#FUNCTION TO READ MARKDOWN
-readmd () {
-  pandoc $1 | lynx -stdin
-}
+#toggle language
+setxkbmap -option grp:alt_space_toggle us,hu
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-FZF_CTRL_T_OPTS="--preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -200'"
-export FZF_CTRL_T_OPTS
+# use docker container caching for pipeline integration test
+export USE_DOCKER_CACHE=1
 
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="/home/imgulyas/.sdkman"
-[[ -s "/home/imgulyas/.sdkman/bin/sdkman-init.sh" ]] && source "/home/imgulyas/.sdkman/bin/sdkman-init.sh"
+# kitty terminal completion
+export TERMINAL='kitty'
+autoload -Uz compinit
+compinit
+# Completion for kitty
+kitty + complete setup zsh | source /dev/stdin
 
+alias ssh='kitty kitten ssh'
+
+alias notesync='rclone copyto ~/notes/ dropbox:notes && rclone copy dropbox:notes ~/notes/ && echo "/home/notes was synced to Dropbox."'
