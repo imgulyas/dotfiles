@@ -30,19 +30,34 @@ values."
    dotspacemacs-configuration-layer-path '()
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(
+   '(systemd
      ;;languages
-     scala
-     haskell
+     typescript
+     (scala-lsp :variables
+                scala-auto-start-metals nil)
+     (haskell :variables ;; Or optionally just haskell without the variables.
+              haskell-enable-hindent-style "johan-tibell"
+              haskell-completion-backend 'ghci
+              haskell-process-type 'stack-ghci)
      javascript
      lua
-     python
+     groovy
      php
      yaml
      html
      emacs-lisp
-     markdown
+     (markdown :variables markdown-live-preview-engine 'vmd)
      sql
+     elm
+     agda
+     rust
+     python
+     idris
+     elixir
+     erlang
+
+     ;;Language server protocol
+     lsp
 
      ;;completion framework
      ivy
@@ -52,6 +67,8 @@ values."
      syntax-checking
 
      ;;utils
+     csv
+     semantic
      restclient
      (shell :variables
             shell-default-position 'right
@@ -73,13 +90,20 @@ values."
      elfeed
 
      ;;
-     spotify
+     (spotify :variables
+              counsel-spotify-client-id "76275b7d21264ec6a0f53ed69e2ba90f"
+              counsel-spotify-client-secret "44ebc101290e45608acade1b9abd934a"
+          )
+     twitter
+     chrome
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '()
+  dotspacemacs-additional-packages '(
+             ;; (lsp-haskell :location (recipe :fetcher github :repo "emacs-lsp/lsp-haskell"))
+                                     )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -158,8 +182,8 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font '("Source Code Pro"
-                               :size 13
+   dotspacemacs-default-font '("Fira Code"
+                               :size 15
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -327,6 +351,10 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
+
+  ;; (add-tolist 'load-path "~/.emacs.d")
+  ;; (require 'edit-server)
+  ;; (edit-server-start)
   )
 
 (defun dotspacemacs/user-config ()
@@ -337,12 +365,16 @@ This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
   (setq deft-directory "~/Dropbox/notes")
-  (setq ensime-startup-notification nil)
   (spacemacs/toggle-highlight-current-line-globally-off)
   (display-time)
-  (golden-ratio-mode t)
+  ;; (golden-ratio-mode t)
+  (auto-complete-mode t)
   (setq truncate-lines t)
   (setq org-reveal-root "/home/imgulyas/.revealJS/")
+  ;; haskell lsp
+  (setq lsp-haskell-process-path-hie "hie-wrapper")
+  (require 'lsp-haskell)
+  (add-hook 'haskell-mode-hook #'lsp)
 
   ;; active Babel languages
   (org-babel-do-load-languages
@@ -353,7 +385,20 @@ you should place your code here."
      (sqlite . t))
    )
   ;; add additional languages with '((language . t)))
+  (setq company-lsp-async t)
+
+  (use-package company
+    :config
+    (push 'company-lsp company-backends))
+
+  (define-key evil-normal-state-map (kbd "s") #'avy-goto-word-1)
+  (define-key evil-motion-state-map (kbd "s") #'avy-goto-word-1)
+  (define-key evil-normal-state-map (kbd "S") #'avy-goto-char-timer)
+  (define-key evil-motion-state-map (kbd "S") #'avy-goto-char-timer)
+;;end
+
   )
+;; Hack to make sure 'company-lsp is only pushed after company package is loaded
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
@@ -365,7 +410,7 @@ you should place your code here."
  '(evil-want-Y-yank-to-eol nil)
  '(package-selected-packages
    (quote
-    (phpunit phpcbf php-extras php-auto-yasnippets drupal-mode php-mode slack emojify circe oauth2 websocket ht imenu-list evil-cleverparens paredit elpy find-file-in-project deft ob-restclient ob-http company-restclient restclient know-your-http-well yaml-mode web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc company-tern tern coffee-mode xterm-color shell-pop multi-term eshell-z eshell-prompt-extras esh-help intero hlint-refactor hindent haskell-snippets flycheck-haskell company-ghci company-ghc ghc haskell-mode company-cabal cmm-mode lua-mode web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode haml-mode emmet-mode company-web web-completion-data noflet ensime sbt-mode scala-mode rainbow-mode rainbow-identifiers color-identifiers-mode origami yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional cython-mode company-anaconda anaconda-mode pythonic smeargle orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md fuzzy flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor diff-hl company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete ws-butler winum which-key wgrep volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline smex restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint ivy-hydra info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-make google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word counsel-projectile column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link))))
+    (phpunit phpcbf php-extras php-auto-yasnippets drupal-mode php-mode slack emojify circe oauth2 websocket ht imenu-list evil-cleverparens paredit elpy find-file-in-project deft ob-restclient ob-http company-restclient restclient know-your-http-well yaml-mode web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc company-tern tern coffee-mode xterm-color shell-pop multi-term eshell-z eshell-prompt-extras esh-help intero hlint-refactor hindent haskell-snippets flycheck-haskell company-ghci company-ghc ghc haskell-mode company-cabal cmm-mode lua-mode web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode haml-mode emmet-mode company-web web-completion-data noflet sbt-mode scala-mode rainbow-mode rainbow-identifiers color-identifiers-mode origami yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional cython-mode company-anaconda anaconda-mode pythonic smeargle orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md fuzzy flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor diff-hl company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete ws-butler winum which-key wgrep volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline smex restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint ivy-hydra info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-make google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word counsel-projectile column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -382,13 +427,37 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("41c8c11f649ba2832347fe16fe85cf66dafe5213ff4d659182e25378f9cfc183" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" default)))
  '(elfeed-feeds
    (quote
     ("http://www.thejerx.com/?format=rss" "www.thejerx.com/?format=rss")))
+ '(ensime-sem-high-faces
+   (quote
+    ((var :foreground "#9876aa" :underline
+          (:style wave :color "yellow"))
+     (val :foreground "#9876aa")
+     (varField :slant italic)
+     (valField :foreground "#9876aa" :slant italic)
+     (functionCall :foreground "#a9b7c6")
+     (implicitConversion :underline
+                         (:color "#808080"))
+     (implicitParams :underline
+                     (:color "#808080"))
+     (operator :foreground "#cc7832")
+     (param :foreground "#a9b7c6")
+     (class :foreground "#4e807d")
+     (trait :foreground "#4e807d" :slant italic)
+     (object :foreground "#6897bb" :slant italic)
+     (package :foreground "#cc7832")
+     (deprecated :strike-through "#a9b7c6"))))
  '(evil-want-Y-yank-to-eol nil)
+ '(org-agenda-files (quote ("~/Dropbox/notes/plans.org")))
  '(package-selected-packages
    (quote
-    (sql-indent phpunit phpcbf php-extras php-auto-yasnippets drupal-mode php-mode slack emojify circe oauth2 websocket ht imenu-list evil-cleverparens paredit elpy find-file-in-project deft ob-restclient ob-http company-restclient restclient know-your-http-well yaml-mode web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc company-tern tern coffee-mode xterm-color shell-pop multi-term eshell-z eshell-prompt-extras esh-help intero hlint-refactor hindent haskell-snippets flycheck-haskell company-ghci company-ghc ghc haskell-mode company-cabal cmm-mode lua-mode web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode haml-mode emmet-mode company-web web-completion-data noflet ensime sbt-mode scala-mode rainbow-mode rainbow-identifiers color-identifiers-mode origami yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional cython-mode company-anaconda anaconda-mode pythonic smeargle orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md fuzzy flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor diff-hl company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete ws-butler winum which-key wgrep volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline smex restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint ivy-hydra info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-make google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word counsel-projectile column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link))))
+    (gmail-message-mode ham-mode html-to-markdown flymd edit-server phpunit phpcbf php-extras php-auto-yasnippets drupal-mode php-mode slack emojify circe oauth2 websocket ht imenu-list evil-cleverparens paredit elpy find-file-in-project deft ob-restclient ob-http company-restclient restclient know-your-http-well yaml-mode web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc company-tern tern coffee-mode xterm-color shell-pop multi-term eshell-z eshell-prompt-extras esh-help intero hlint-refactor hindent haskell-snippets flycheck-haskell company-ghci company-ghc ghc haskell-mode company-cabal cmm-mode lua-mode web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode haml-mode emmet-mode company-web web-completion-data noflet sbt-mode scala-mode rainbow-mode rainbow-identifiers color-identifiers-mode origami yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional cython-mode company-anaconda anaconda-mode pythonic smeargle orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-download mmm-mode markdown-toc markdown-mode magit-gitflow htmlize gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md fuzzy flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit with-editor diff-hl company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete ws-butler winum which-key wgrep volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline smex restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint ivy-hydra info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-make google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word counsel-projectile column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link)))
+ '(sql-db2-login-params (quote (port))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

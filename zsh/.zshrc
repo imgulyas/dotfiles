@@ -101,7 +101,8 @@ alias esctocaps='/usr/bin/setxkbmap -option "caps:escape"'
 export EDITOR='emacsclient --create-frame --no-wait "$@"'
 
 #BROWSER
-export BROWSER='/var/lib/snapd/snap/bin/firefox'
+# export BROWSER='/var/lib/snapd/snap/bin/firefox'
+export BROWSER='/usr/bin/chromium'
 
 #INOTIFY
 #echo 16384 | sudo tee /proc/sys/fs/inotify/max_user_watches
@@ -124,3 +125,23 @@ kitty + complete setup zsh | source /dev/stdin
 alias ssh='kitty kitten ssh'
 
 alias notesync='rclone copyto ~/notes/ dropbox:notes && rclone copy dropbox:notes ~/notes/ && echo "/home/notes was synced to Dropbox."'
+
+#git
+alias gsr='git rebase -i --autosquash'
+
+#scala language server
+export METALS_ENABLED='true'
+
+export PATH=$PATH:$HOME/.local/bin/
+export PATH=$PATH:$HOME/scripts/
+
+export PATH=$PATH:$HOME/.nimble/bin
+
+alias better="$HOME/.local/bin/betterscreenlock -l"
+
+alias csvhtml="$BROWSER ~/view.html#"
+
+export PATH="$HOME/.emacs.d/bin:$PATH"
+
+export PATH="$HOME/.idris2/bin:$PATH"
+[ -f "${GHCUP_INSTALL_BASE_PREFIX:=$HOME}/.ghcup/env" ] && source "${GHCUP_INSTALL_BASE_PREFIX:=$HOME}/.ghcup/env"
