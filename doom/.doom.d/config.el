@@ -54,3 +54,5 @@
 (evil-snipe-mode -1)
 (map! :nm "s" #'avy-goto-word-1
       :nm "S" #'avy-goto-char-timer)
+
+(setq doom-font (font-spec :family "Fira Code" :size 15))
