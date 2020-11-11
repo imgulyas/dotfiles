@@ -85,7 +85,7 @@
        magit             ; a git porcelain for Emacs
        make              ; run make tasks from Emacs
        ;;pass              ; password manager for nerds
-       pdf               ; pdf enhancements
+       ;;pdf               ; pdf enhancements
        ;;prodigy           ; FIXME managing external services & code builders
        ;;rgb               ; creating color strings
        ;;terraform         ; infrastructure as code
@@ -101,7 +101,7 @@
        ;;common-lisp       ; if you've seen one lisp, you've seen them all
        ;;coq               ; proofs-as-programs
        ;;crystal           ; ruby at the speed of c
-       ;;csharp            ; unity, .NET, and mono shenanigans
+       csharp            ; unity, .NET, and mono shenanigans
        data              ; config/data formats
        ;;erlang            ; an elegant language for a more civilized age
        ;;elixir            ; erlang done right
@@ -110,7 +110,7 @@
        ;;ess               ; emacs speaks statistics
        ;;fsharp           ; ML stands for Microsoft's Language
        ;;go                ; the hipster dialect
-       (haskell +lsp) ; a language that's lazier than I am
+       haskell ; a language that's lazier than I am
        ;;hy                ; readability of scheme w/ speed of python
        idris             ;
        ;;(java +meghanada) ; the poster child for carpal tunnel syndrome
@@ -126,8 +126,12 @@
        ;;ocaml             ; an objective camel
        (org              ; organize your plain life in plain text
         +dragndrop       ; file drag & drop support
-        +ipython         ; ipython support for babel
+        ;;+ipython         ; ipython support for babel
         +pandoc          ; pandoc integration into org's exporter
+        +pomodoro
+        ;;+jupyter
+        +journal
+        ;;+roam
         +present)        ; using Emacs for presentations
        ;;perl              ; write code no one else can comprehend
        ;;php               ; perl's insecure younger brother
@@ -136,7 +140,7 @@
        python            ; beautiful is better than ugly
        ;;qt                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs
-       ;;rest              ; Emacs as a REST client
+       rest              ; Emacs as a REST client
        ;;ruby              ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
        ;;rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        scala             ; java, but good
@@ -178,3 +182,11 @@
        ;; config. Use it as a reference for your own modules.
        (default +bindings +smartparens))
 
+
+;; web capture template
+;;(add-to-list
+;;  'org-capture-templates
+;;
+;;  '("w" "Web site"
+;;    entry (file+olp "~/org/inbox.org" "Web")
+;;    "* %c :website:\n%U %?%:initial"))
